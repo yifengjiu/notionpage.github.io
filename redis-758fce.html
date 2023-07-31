@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- iOS Safari -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- Chrome, Firefox OS and Opera Status Bar Color -->
+<meta name="theme-color" content="#FFFFFF">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css">
+<link rel="stylesheet" type="text/css"
+  href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/themes/prism.min.css">
+<link rel="stylesheet" type="text/css" href="css/SourceSansPro.css">
+<link rel="stylesheet" type="text/css" href="css/theme.css">
+<link rel="stylesheet" type="text/css" href="css/notablog.css">
+<!-- Favicon -->
+
+<style>
+  :root {
+    font-size: 20px;
+  }
+</style>
+  <title>Redis缓存穿透，缓存溢出，缓存雪崩（布隆过滤器）&nbsp;|&nbsp;沂风</title>
+  <meta property="og:type" content="blog">
+  <meta property="og:title" content="Redis缓存穿透，缓存溢出，缓存雪崩（布隆过滤器）">
+  
+    <meta name="description" content="Redis缓存">
+    <meta property="og:description" content="Redis缓存">
+  
+  
+    <meta property="og:image" content="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;🎠&lt;/text&gt;&lt;/svg&gt;">
+  
+  <style>
+    .DateTagBar {
+      margin-top: 1.0rem;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="Navbar">
+  <a href="index.html">
+    <div class="Navbar__Btn">
+      
+      <span>Home</span>
+    </div>
+  </a>
+  
+    
+      <span class="Navbar__Delim">&centerdot;</span>
+      <a href="redis-758fce.html">
+        <div class="Navbar__Btn">
+          
+            <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;🎠&lt;/text&gt;&lt;/svg&gt;"></span>&nbsp;
+          
+          <span>Redis缓存穿透，缓存溢出，缓存雪崩（布隆过滤器）</span>
+        </div>
+      </a>
+    
+  
+    
+      <span class="Navbar__Delim">&centerdot;</span>
+      <a href="--cb6977.html">
+        <div class="Navbar__Btn">
+          
+            <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;🕢&lt;/text&gt;&lt;/svg&gt;"></span>&nbsp;
+          
+          <span>线程池 </span>
+        </div>
+      </a>
+    
+  
+    
+  
+    
+  
+    
+      <span class="Navbar__Delim">&centerdot;</span>
+      <a href="about.html">
+        <div class="Navbar__Btn">
+          
+            <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;😀&lt;/text&gt;&lt;/svg&gt;"></span>&nbsp;
+          
+          <span>关于</span>
+        </div>
+      </a>
+    
+  
+</nav>
+  <header class="Header">
+    
+      <div class="Header__Cover">
+        <img src="https://www.notion.so/images/page-cover/woodcuts_10.jpg">
+      </div>
+    
+    <div class="Header__Spacer ">
+    </div>
+    
+      <div class="Header__Icon">
+        <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;🎠&lt;/text&gt;&lt;/svg&gt;"></span>
+      </div>
+    
+    <h1 class="Header__Title">Redis缓存穿透，缓存溢出，缓存雪崩（布隆过滤器）</h1>
+    
+      <div class="DateTagBar">
+        
+          <span class="DateTagBar__Item DateTagBar__Date">Posted on Mon, Jul 31, 2023</span>
+        
+        
+          <span class="DateTagBar__Item DateTagBar__Tag DateTagBar__Tag--yellow">
+            <a href="tag/Redis.html">Redis</a>
+          </span>
+        
+      </div>
+    
+  </header>
+  <article id="https://www.notion.so/758fceda67d54dcb82c7c4066950b1dd" class="PageRoot"><ul id="https://www.notion.so/077f0dd6f1f74663b40ba935128e30f1" class="ColorfulBlock ColorfulBlock--ColorGray TableOfContents"><li class="TableOfContents__Item"><a href="#https://www.notion.so/1f16bd5d527843edbb0db424ccab8a72"><div style="margin-left:0px"><span class="SemanticStringArray"><span class="SemanticString">缓存雪崩</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/87f45ca7454c48e5814d22422e639876"><div style="margin-left:24px"><span class="SemanticStringArray"><span class="SemanticString">解决办法</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/6e7c20bcf70c4f31a3a668c95d06581f"><div style="margin-left:24px"><span class="SemanticStringArray"><span class="SemanticString">事前</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/7122c95e700749bb9d4dadcffa87a591"><div style="margin-left:48px"><span class="SemanticStringArray"><span class="SemanticString">大量数据同时过期</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/d93dcebe42d24292a23803a90725241a"><div style="margin-left:24px"><span class="SemanticStringArray"><span class="SemanticString">事中</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/3c9640a17209490e8b0918cffa8f102f"><div style="margin-left:48px"><span class="SemanticStringArray"><span class="SemanticString">Redis故障宕机</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/7211f97872954933bfda264d56c71eea"><div style="margin-left:24px"><span class="SemanticStringArray"><span class="SemanticString">缓存击穿</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/bc1ec0cf2ed048008322d2431d140dca"><div style="margin-left:24px"><span class="SemanticStringArray"><span class="SemanticString">缓存穿透</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/02eef77ebdaa4935992fa7dcbe7627ae"><div style="margin-left:24px"><span class="SemanticStringArray"><span class="SemanticString">如何添加互斥锁</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/fb042507826f402e8481459bf83e32b7"><div style="margin-left:24px"><span class="SemanticStringArray"><span class="SemanticString">布隆过滤器</span></span></div></a></li></ul><h1 id="https://www.notion.so/1f16bd5d527843edbb0db424ccab8a72" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/1f16bd5d527843edbb0db424ccab8a72"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">缓存雪崩</span></span></h1><div id="https://www.notion.so/63a82edea92d4b048f88f7aef2767de3" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">当</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">大量缓存数据在同一时间过期或者 Redis 故障宕机</strong></span><span class="SemanticString">时，如果此时有大量的用户请求，都无法在 Redis 中处理，于是全部请求都直接访问数据库，从而导致数据库的压力增加，严重的会造成数据库宕机，从而形成一系列连锁反应，造成整个系统崩溃。</span></span></p></div><h2 id="https://www.notion.so/87f45ca7454c48e5814d22422e639876" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/87f45ca7454c48e5814d22422e639876"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">解决办法</span></span></h2><h2 id="https://www.notion.so/6e7c20bcf70c4f31a3a668c95d06581f" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/6e7c20bcf70c4f31a3a668c95d06581f"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">事前</span></span></h2><h3 id="https://www.notion.so/7122c95e700749bb9d4dadcffa87a591" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/7122c95e700749bb9d4dadcffa87a591"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">大量数据同时过期</span></span></h3><ul class="BulletedListWrapper"><li id="https://www.notion.so/1add963cb8d943afbfea8f9e35cb40af" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">均匀设置过期时间</strong></span><span class="SemanticString">：避免将大量的数据设置成同一个过期时间。</span></span></li><li id="https://www.notion.so/c6c104bc3b5340efa249d037b26e82cf" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">互斥锁</strong></span><span class="SemanticString">：当业务线程在处理用户请求时，如果发现访问的数据不在 Redis 里，就加个互斥锁，保证同一时间内只有一个请求来构建缓存。未能获取互斥锁的请求等待锁释放后重新读取缓存，或者返回空值或者默认值。</span></span></li><li id="https://www.notion.so/49100545732d4d1394c83d8b75e88587" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">双key策略</strong></span><span class="SemanticString">：使用两个key，一个是主key，设置过期时间，一个是备key，不会设置过期，key不一样，但是value值是一样。当业务线程访问不到主key的缓存数据时，就直接返回备key的缓存数据，然后在更新缓存的时候，同时更新主key和备key的数据。</span></span></li><li id="https://www.notion.so/7b2ebbf4a3764f8b86589d25b9dbd147" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">后台更新缓存</strong></span><span class="SemanticString">：业务线程不再负责更新缓存，缓存也不设置有效期，而是让缓存“永久有效”，并将更新缓存的工作交由后台线程定时更新。</span></span></li></ul><h2 id="https://www.notion.so/d93dcebe42d24292a23803a90725241a" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/d93dcebe42d24292a23803a90725241a"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">事中</span></span></h2><h3 id="https://www.notion.so/3c9640a17209490e8b0918cffa8f102f" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/3c9640a17209490e8b0918cffa8f102f"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">Redis故障宕机</span></span></h3><ul class="BulletedListWrapper"><li id="https://www.notion.so/fcda2f2ec52347c79c7bcd7c8b751c6d" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString">服务熔断或请求限流机制：启动</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">服务熔断</strong></span><span class="SemanticString">机制，</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">暂停业务应用对缓存服务的访问，直接返回错误</strong></span><span class="SemanticString">，所以不用再继续访问数据库，保证数据库系统的正常运行，等到 Redis 恢复正常后，再允许业务应用访问缓存服务。服务熔断机制是保护数据库的正常允许，但是暂停了业务应用访问缓存服系统，全部业务都无法正常工作。</span></span></li><li id="https://www.notion.so/7eea4c09958640ca962e5ef59aa873a5" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString">也可以启用</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">请求限流</strong></span><span class="SemanticString">机制，</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">只将少部分请求发送到数据库进行处理，再多的请求就在入口直接拒绝服务</strong></span><span class="SemanticString">。</span></span></li><li id="https://www.notion.so/460c33d7a4ea4a989122aeada77e2af2" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString">构建高可靠集群：通过</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">主从节点的方式构建 Redis 缓存高可靠集群</strong></span><span class="SemanticString">。如果 Redis 缓存的主节点故障宕机，从节点可以切换成为主节点，继续提供缓存服务，避免了由于 Redis 故障宕机而导致的缓存雪崩问题。</span></span></li></ul><div id="https://www.notion.so/249d74540e67424ab09813c661deca03" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"></span></p></div><h1 id="https://www.notion.so/7211f97872954933bfda264d56c71eea" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/7211f97872954933bfda264d56c71eea"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">缓存击穿</span></span></h1><div id="https://www.notion.so/34f19abc333e47cd871c0d144fb9b9ae" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">如果缓存中的</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">某个热点数据过期</strong></span><span class="SemanticString">了，此时大量的请求访问了该热点数据，就无法从缓存中读取，直接访问数据库，数据库很容易就被高并发的请求冲垮。</span></span></p></div><ul class="BulletedListWrapper"><li id="https://www.notion.so/8b3f5a9ed9cf4706a0fd8ac88ca97ed7" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">互斥锁方案</strong></span><span class="SemanticString">：保证同一时间只有一个业务线程更新缓存，未能获取互斥锁的请求，要么等待锁释放后重新读取缓存，要么就返回空值或者默认值。</span></span></li><li id="https://www.notion.so/4c99a5faaee74d3d931a2deeb5105cad" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">不给热点数据设置过期时间</strong></span><span class="SemanticString">：由后台异步更新缓存，或者在热点数据准备要过期前，提前通知后台线程更新缓存以及重新设置过期时间。</span></span></li></ul><h1 id="https://www.notion.so/bc1ec0cf2ed048008322d2431d140dca" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/bc1ec0cf2ed048008322d2431d140dca"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">缓存穿透</span></span></h1><div id="https://www.notion.so/794fcf65242741ff8d934af6b2cd01b0" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">当用户访问的数据，</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">既不在缓存中，也不在数据库中</strong></span><span class="SemanticString">，导致请求在访问缓存时，发现缓存缺失，再去访问数据库时，发现数据库中也没有要访问的数据，没办法构建缓存数据，来服务后续的请求。那么当有大量这样的请求到来时，数据库的压力骤增，这就是</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">缓存穿透</strong></span><span class="SemanticString">的问题。</span></span></p></div><ul class="BulletedListWrapper"><li id="https://www.notion.so/c3fce6ba382a4e618c2c28befa669278" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">非法请求的限制</strong></span><span class="SemanticString">：当有大量恶意请求访问不存在的数据的时候会发生缓存穿透，可以在 API 入口处判断求请求参数是否合理，请求参数是否含有非法值、请求字段是否存在，如果判断出是恶意请求就直接返回错误，避免进一步访问缓存和数据库。（400错误）</span></span></li><li id="https://www.notion.so/db09b5e3ea9d45ee9a0c561c57922d5f" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">缓存空值或者默认值</strong></span><span class="SemanticString">：当线上业务发现缓存穿透的现象时，可以针对查询的数据，在缓存中设置一个空值或者默认值，这样后续请求就可以从缓存中读取到空值或者默认值，返回给应用，而不会继续查询数据库。</span></span></li><li id="https://www.notion.so/60ff6e43db254f37bba4e22e260be0c7" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">使用布隆过滤器快速判断数据是否存在，避免通过查询数据库来判断数据是否存在</strong></span><span class="SemanticString">：可以在写入数据库数据时，使用布隆过滤器做个标记，然后在用户请求到来时，业务线程确认缓存失效后，可以通过查询布隆过滤器快速判断数据是否存在，如果不存在，就不用通过查询数据库来判断数据是否存在。</span></span></li></ul><div id="https://www.notion.so/5b88563133d3452db4a4a129f611218b" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"></span></p></div><h1 id="https://www.notion.so/02eef77ebdaa4935992fa7dcbe7627ae" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/02eef77ebdaa4935992fa7dcbe7627ae"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">如何添加互斥锁</span></span></h1><div id="https://www.notion.so/0dad50a162bf4b6887d8bf24a1fce0ec" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">缓存击穿后，多个线程会同时去查询数据库的这条数据，那么我们可以在第一个查询数据的请求上使用一个互斥锁来锁住它。</span></span></p></div><div id="https://www.notion.so/c0687516cdb142189a33a5ecc156718a" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">其他的线程走到这一步拿不到锁就等着，等第一个线程查询到了数据，然后做缓存。后面的线程进来发现已经有缓存了，就直接走缓存。</span></span></p></div><div id="https://www.notion.so/ca2ebdc62ba44914a9d9be3008f57333" class="Image Image--PageWidth"><figure><a href="https://www.notion.so/signed/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F07f9a42a-6140-4813-8766-8b49741f21c5%2FUntitled.png?width=1798&amp;table=block&amp;id=ca2ebdc6-2ba4-4914-a9d9-be3008f57333"><img src="https://www.notion.so/signed/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F07f9a42a-6140-4813-8766-8b49741f21c5%2FUntitled.png?width=1798&amp;table=block&amp;id=ca2ebdc6-2ba4-4914-a9d9-be3008f57333" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><div id="https://www.notion.so/8bcdd32fb95b40358eb0a1b62c92317f" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"></span></p></div><h1 id="https://www.notion.so/fb042507826f402e8481459bf83e32b7" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/fb042507826f402e8481459bf83e32b7"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">布隆过滤器</span></span></h1><div id="https://www.notion.so/f43144fa79fe4d76b5c5fe03a755bf28" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">布隆过滤器由</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">初始值都为0的位图数组</strong></span><span class="SemanticString">和</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">N个哈希函数</strong></span><span class="SemanticString">两部分组成。在写入数据库数据时，在布隆过滤器里做个标记，这样下次查询数据是否在数据库时，只需要查询布隆过滤器，如果查询到数据没有被标记，说明不在数据库中。</span></span></p></div><ul class="BulletedListWrapper"><li id="https://www.notion.so/bb0f08c713bb4f40967428e7dee83fc8" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString">第一步，使用 N 个哈希函数分别对数据做哈希计算，得到 N 个哈希值</span></span></li><li id="https://www.notion.so/35d6c01cc64b437cbf2e0c89366f4326" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString">第二步，将第一步得到的 N 个哈希值对位图数组的长度取模，得到每个哈希值在位图数组的对应位置</span></span></li><li id="https://www.notion.so/ea286d8ea20245e49c837041657d3484" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString">第三步，将每个哈希值在位图数组的对应位置的值设置为 1</span></span></li></ul><div id="https://www.notion.so/b8d8be85fa48498695562bdde5115624" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">缺陷</strong></span></span></p></div><ul class="BulletedListWrapper"><li id="https://www.notion.so/3af83bbb950b471eb04d1b871cc41617" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString">布隆过滤器由于是基于哈希函数实现查找的，会存在哈希冲突的可能性，数据可能落在相同位置，存在误判的情况。查询布隆过滤器说数据存在，并不一定证明数据库中存在这个数据，但是查询到数据不存在，数据库中一定就不存在这个数据。</span></span></li><li id="https://www.notion.so/2f9250355d4947d4a348c5475dc4b51b" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString">不支持一个关键字的删除，因为一个关键字的删除会牵连其他的关键字。改进方法就是counting Bloom filter，用一个counter数组代替位数组，就可以支持删除了。</span></span></li><li id="https://www.notion.so/56d358b4ac644b0f9b21549253cfdb4a" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString">对于输入的n个元素，要确定数组m大小和hash函数的个数，hash函数个数k = （ln2）*（m/n）时，错误率最小。在错误率不大于E情况下，m至少要等于n*lg(1/E)才能表示n个元素的集合。</span></span></li></ul><div id="https://www.notion.so/7365a41879d547009727ae7d82bd960b" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"></span></p></div><div id="https://www.notion.so/ebf9cc6b1e46415fbaecd6ed1041e7a8" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"></span></p></div></article>
+  <footer class="Footer">
+  <div>&copy; 沂风 2022</div>
+  <div>&centerdot;</div>
+  <div>Powered by <a href="https://github.com/dragonman225/notablog" target="_blank"
+      rel="noopener noreferrer">Notablog</a>.
+  </div>
+</footer>
+</body>
+
+</html>
