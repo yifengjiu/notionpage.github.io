@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- iOS Safari -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- Chrome, Firefox OS and Opera Status Bar Color -->
+<meta name="theme-color" content="#FFFFFF">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css">
+<link rel="stylesheet" type="text/css"
+  href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/themes/prism.min.css">
+<link rel="stylesheet" type="text/css" href="css/SourceSansPro.css">
+<link rel="stylesheet" type="text/css" href="css/theme.css">
+<link rel="stylesheet" type="text/css" href="css/notablog.css">
+<!-- Favicon -->
+
+<style>
+  :root {
+    font-size: 20px;
+  }
+</style>
+  <title>Lamda &nbsp;|&nbsp;沂风</title>
+  <meta property="og:type" content="blog">
+  <meta property="og:title" content="Lamda ">
+  
+    <meta name="description" content="Lamda表达式操作">
+    <meta property="og:description" content="Lamda表达式操作">
+  
+  
+    <meta property="og:image" content="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;🏏&lt;/text&gt;&lt;/svg&gt;">
+  
+  <style>
+    .DateTagBar {
+      margin-top: 1.0rem;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="Navbar">
+  <a href="index.html">
+    <div class="Navbar__Btn">
+      
+      <span>Home</span>
+    </div>
+  </a>
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <span class="Navbar__Delim">&centerdot;</span>
+      <a href="about.html">
+        <div class="Navbar__Btn">
+          
+            <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;😀&lt;/text&gt;&lt;/svg&gt;"></span>&nbsp;
+          
+          <span>关于</span>
+        </div>
+      </a>
+    
+  
+    
+  
+</nav>
+  <header class="Header">
+    
+      <div class="Header__Cover">
+        <img src="https://www.notion.so/images/page-cover/rijksmuseum_vermeer_the_milkmaid.jpg">
+      </div>
+    
+    <div class="Header__Spacer ">
+    </div>
+    
+      <div class="Header__Icon">
+        <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;🏏&lt;/text&gt;&lt;/svg&gt;"></span>
+      </div>
+    
+    <h1 class="Header__Title">Lamda </h1>
+    
+      <div class="DateTagBar">
+        
+          <span class="DateTagBar__Item DateTagBar__Date">Posted on Thu, Aug 17, 2023</span>
+        
+        
+          <span class="DateTagBar__Item DateTagBar__Tag DateTagBar__Tag--blue">
+            <a href="tag/Java.html">Java</a>
+          </span>
+        
+      </div>
+    
+  </header>
+  <article id="https://www.notion.so/bfb57d64ae6144e0987cf7f3e0d82d7e" class="PageRoot"><pre id="https://www.notion.so/1391a4365da34b088eb9bb276f4702d9" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span><span class="token comment">//Lambda表达式改进</span>
+        <span class="token keyword">new</span> <span class="token class-name">Thread</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-></span> <span class="token punctuation">{</span>
+            <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"多线程程序启动了..."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span></span></span></code></pre><pre id="https://www.notion.so/475d60d63d99427dbc08a0e6283f80cd" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span><span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">Eatable</span> <span class="token punctuation">{</span>
+    <span class="token keyword">void</span> <span class="token function">eat</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">EatableDemo</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">//用Lambda表达式</span>
+        <span class="token function">useEatable</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-></span> <span class="token punctuation">{</span>
+            <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"一天一苹果，医生远离我"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">useEatable</span><span class="token punctuation">(</span><span class="token class-name">Eatable</span> e<span class="token punctuation">)</span><span class="token punctuation">{</span>
+        e<span class="token punctuation">.</span><span class="token function">eat</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</span></span></span></code></pre><pre id="https://www.notion.so/593c18bae511491fad440afd5b2d4eda" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span><span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">Flyable</span><span class="token punctuation">{</span>
+    <span class="token keyword">void</span> <span class="token function">fly</span><span class="token punctuation">(</span><span class="token class-name">String</span> s<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">FlyableDemo</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">//Lambda</span>
+        <span class="token function">useFlyable</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">String</span> s<span class="token punctuation">)</span><span class="token operator">-></span> <span class="token punctuation">{</span>
+            <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"飞机自驾游"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">useFlyable</span><span class="token punctuation">(</span><span class="token class-name">Flyable</span> f<span class="token punctuation">)</span><span class="token punctuation">{</span>
+        f<span class="token punctuation">.</span><span class="token function">fly</span><span class="token punctuation">(</span><span class="token string">"风和日丽，晴空万里"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></span></span></span></code></pre><pre id="https://www.notion.so/7be6f43c61484fe0b047f3bdc5a01f1b" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span><span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">Addable</span> <span class="token punctuation">{</span>
+    <span class="token keyword">int</span> <span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">int</span> x<span class="token punctuation">,</span><span class="token keyword">int</span> y<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">AddableDemo</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">//在主方法中调用useAddle方法</span>
+        <span class="token comment">//Lambda</span>
+        <span class="token function">useAddable</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">int</span> a<span class="token punctuation">,</span> <span class="token keyword">int</span> b<span class="token punctuation">)</span> <span class="token operator">-></span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> a<span class="token operator">+</span>b<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">useAddable</span><span class="token punctuation">(</span><span class="token class-name">Addable</span> a<span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">int</span> sum <span class="token operator">=</span> a<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>sum<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></span></span></span></code></pre><div id="https://www.notion.so/2595ee78c9ee404283fcf4d86ad6f893" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">综合上述三个方法可以看出，当我们使用实现类的方式实现需求的时候，我们可以看到我们需要先创建一个实体类，然后将实现类的对象传进去才可以使用。
+当我们使用你们匿名内部类的方法实现需求时，我们可以发现需要重写run方法（当我们调用其他方法，忘记去重写什么方法时会比较懵逼），相比较也是比较麻烦的。
+当我们使用Lambda表达式来实现需求时，我们可以看到我们不用关心创建了什么实体类、重写了什么方法。我们只需要关心它最终要做的事情是System.out.println(&quot;多线程程序启动了...&quot;);
+</span></span></p></div><div id="https://www.notion.so/de28379ae3ce48bea8a95fafe411453d" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">Lambda表达式的标准格式
+组成Lambda表达式的三要素：形式参数，箭头，代码块
+Lambda表达式的格式
+①、格式：(形式参数) -&gt; {代码块}
+②、形式参数：如果有多个参数，参数之间用逗号隔开；如果没有参数，留空即可
+③、-&gt;：由英文中画线和大于符号组成，固定写法。代表指向动作
+④、代码块：是我们具体要做的事情，也就是以前我们写的方法体内容
+</span></span></p></div><h1 id="https://www.notion.so/cc2631e93de14fd19d3e2ef1eff6cb5e" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/cc2631e93de14fd19d3e2ef1eff6cb5e"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">Lambda表达式的使用前提①、有一个接口②、接口中有且仅有一个抽象方法</span></span></h1><div id="https://www.notion.so/749f602f115a4852b72050383c016513" class="Bookmark"><a href="https://blog.csdn.net/qq_44096670/article/details/116495047"><p class="Bookmark__Link">https://blog.csdn.net/qq_44096670/article/details/116495047</p></a></div><h1 id="https://www.notion.so/56d50e022b054215948225bf102c10d0" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/56d50e022b054215948225bf102c10d0"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">使用（）→{}的方式，代替创建一个类</span></span></h1><h1 id="https://www.notion.so/398546c1d02c483dbbf10714c9d5b69a" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/398546c1d02c483dbbf10714c9d5b69a"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">省略规则</span></span></h1><ul class="BulletedListWrapper"><li id="https://www.notion.so/f1d9f78b128c4ac6988fa18358ca445c" class="BulletedList"><span class="SemanticStringArray"><span class="SemanticString">省略规则：①、参数类型可以省略。但是有多个参数的情况下，不能只省略一个②、如果参数有且仅有一个，那么小括号可以省略③、如果代码块的语句只有一条，可以省略大括号和分号，甚至是return</span></span></li></ul><pre id="https://www.notion.so/094306179bef4269ae66be1b4aa500bd" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span><span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">Flyable</span><span class="token punctuation">{</span>
+    <span class="token keyword">void</span> <span class="token function">fly</span><span class="token punctuation">(</span><span class="token class-name">String</span> s<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">Addable</span> <span class="token punctuation">{</span>
+    <span class="token keyword">int</span> <span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">int</span> x<span class="token punctuation">,</span><span class="token keyword">int</span> y<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token comment">/*Lambda表达式的省略模式*/</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">LambdaDemo</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">//useAddable((int x,int y) -> {</span>
+        <span class="token comment">//    return x+y;</span>
+        <span class="token comment">//});</span>
+        <span class="token comment">//1.参数的类型可以省略,但是有多个参数的情况下，不能只省略一个</span>
+        <span class="token function">useAddable</span><span class="token punctuation">(</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span>y<span class="token punctuation">)</span> <span class="token operator">-></span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> x<span class="token operator">+</span>y<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">//useFlyable((String s) ->{</span>
+        <span class="token comment">//    System.out.println(s);</span>
+        <span class="token comment">//});</span>
+        <span class="token comment">//2.如果参数有且只有一个，那么小括号可以省略</span>
+        <span class="token function">useFlyable</span><span class="token punctuation">(</span> s<span class="token operator">-></span><span class="token punctuation">{</span>
+            <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">//3.如果代码块的语句只有一条，可以省略大括号和分号</span>
+        <span class="token function">useFlyable</span><span class="token punctuation">(</span>s <span class="token operator">-></span> <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">//4.如果代码块的语句只有一条，可以省略大括号和分号;如果有return,return也要省略</span>
+        <span class="token function">useAddable</span><span class="token punctuation">(</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span>y<span class="token punctuation">)</span> <span class="token operator">-></span> x<span class="token operator">+</span>y <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">useFlyable</span><span class="token punctuation">(</span><span class="token class-name">Flyable</span> f<span class="token punctuation">)</span><span class="token punctuation">{</span>
+        f<span class="token punctuation">.</span><span class="token function">fly</span><span class="token punctuation">(</span><span class="token string">"风和日丽，晴空万里"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">useAddable</span><span class="token punctuation">(</span><span class="token class-name">Addable</span> a<span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">int</span> sum <span class="token operator">=</span> a<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>sum<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></span></span></span></code></pre><h1 id="https://www.notion.so/eecf5e7e5a82443cacbfc0292aacbcaa" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/eecf5e7e5a82443cacbfc0292aacbcaa"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">注意事项</span></span></h1><div id="https://www.notion.so/eff91a6a79f04852a17bc761290b2213" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">注意事项：
+①、使用Lambda必须要有接口，并且要求接口中有且仅有一个抽象方法
+②、必须有上下文环境，才能推导出Lambda对应的接口
+③、根据局部变量的赋值得知Lambda对应的接口：Runnable r = () -&gt; System.out.println(“Lambda表达式”);
+④、根据调用方法的参数得知Lambda对应的接口：new Thread(() -&gt; System.out.println(“Lambda表达式”)).start();
+————————————————
+版权声明：本文为CSDN博主「bfhonor」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：</span><span class="SemanticString"><a class="SemanticString__Fragment SemanticString__Fragment--Link" href="https://blog.csdn.net/qq_44096670/article/details/116495047">https://blog.csdn.net/qq_44096670/article/details/116495047</a></span></span></p></div><h1 id="https://www.notion.so/9291d53abdd24781b386990eee0116e2" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/9291d53abdd24781b386990eee0116e2"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">所需类型不同</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">①、匿名内部类：可以是接口，也可以是抽象类，还可以是具体类②、Lambda表达式：只能是接口</strong></span></span></h1><h1 id="https://www.notion.so/4ad8e457b9e84b42bbea3954622b4d91" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/4ad8e457b9e84b42bbea3954622b4d91"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">如果接口中有且仅有一个抽象方法，可以使用Lambda表达式，也可以使用匿名内部类②、如果接口中多于一个抽象方法，只能使用匿名内部类，而不能使用Lambda表达式</strong></span></span></h1><div id="https://www.notion.so/f232d9f31b574affa97507fea111cb52" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"></span></p></div><h1 id="https://www.notion.so/e1b68362098a473e85ecc6dbe2fc4afc" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/e1b68362098a473e85ecc6dbe2fc4afc"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">匿名内部类：编译之后，产生一个单独的.class字节码文件②、Lambda表达式：编译之后，没有一个单独的.class字节码文件。对应的字节码会在运行的时候动态生成</strong></span></span></h1><h1 id="https://www.notion.so/61d5ed4a6d8e4e759431bd91046b4b64" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/61d5ed4a6d8e4e759431bd91046b4b64"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">参考文章</span></span></h1><div id="https://www.notion.so/3a4c811a2e794734afd821f8f2b2859e" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><a class="SemanticString__Fragment SemanticString__Fragment--Link" href="https://blog.csdn.net/qq_44096670/article/details/116495047">https://blog.csdn.net/qq_44096670/article/details/116495047</a></span><span class="SemanticString">
+</span></span></p></div><div id="https://www.notion.so/ef71fa7d9fea432fb66860121be9aa75" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"></span></p></div></article>
+  <footer class="Footer">
+  <div>&copy; 沂风 2022</div>
+  <div>&centerdot;</div>
+  <div>Powered by <a href="https://github.com/dragonman225/notablog" target="_blank"
+      rel="noopener noreferrer">Notablog</a>.
+  </div>
+</footer>
+</body>
+
+</html>
