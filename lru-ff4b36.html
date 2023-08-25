@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- iOS Safari -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- Chrome, Firefox OS and Opera Status Bar Color -->
+<meta name="theme-color" content="#FFFFFF">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css">
+<link rel="stylesheet" type="text/css"
+  href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/themes/prism.min.css">
+<link rel="stylesheet" type="text/css" href="css/SourceSansPro.css">
+<link rel="stylesheet" type="text/css" href="css/theme.css">
+<link rel="stylesheet" type="text/css" href="css/notablog.css">
+<!-- Favicon -->
+
+<style>
+  :root {
+    font-size: 20px;
+  }
+</style>
+  <title>手写LRU算法&nbsp;|&nbsp;沂风</title>
+  <meta property="og:type" content="blog">
+  <meta property="og:title" content="手写LRU算法">
+  
+    <meta name="description" content="利用手写双向链表+HashMap或者集成LinkedHashMap的方式手写LRU算法">
+    <meta property="og:description" content="利用手写双向链表+HashMap或者集成LinkedHashMap的方式手写LRU算法">
+  
+  
+    <meta property="og:image" content="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;🎍&lt;/text&gt;&lt;/svg&gt;">
+  
+  <style>
+    .DateTagBar {
+      margin-top: 1.0rem;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="Navbar">
+  <a href="index.html">
+    <div class="Navbar__Btn">
+      
+      <span>Home</span>
+    </div>
+  </a>
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <span class="Navbar__Delim">&centerdot;</span>
+      <a href="about.html">
+        <div class="Navbar__Btn">
+          
+            <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;😀&lt;/text&gt;&lt;/svg&gt;"></span>&nbsp;
+          
+          <span>关于</span>
+        </div>
+      </a>
+    
+  
+    
+  
+</nav>
+  <header class="Header">
+    
+      <div class="Header__Cover">
+        <img src="https://www.notion.so/images/page-cover/webb4.jpg">
+      </div>
+    
+    <div class="Header__Spacer ">
+    </div>
+    
+      <div class="Header__Icon">
+        <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;🎍&lt;/text&gt;&lt;/svg&gt;"></span>
+      </div>
+    
+    <h1 class="Header__Title">手写LRU算法</h1>
+    
+      <div class="DateTagBar">
+        
+          <span class="DateTagBar__Item DateTagBar__Date">Posted on Sat, Aug 26, 2023</span>
+        
+        
+          <span class="DateTagBar__Item DateTagBar__Tag DateTagBar__Tag--gray">
+            <a href="tag/手写题.html">手写题</a>
+          </span>
+        
+      </div>
+    
+  </header>
+  <article id="https://www.notion.so/ff4b369e998d4daabb0586e70f571cdb" class="PageRoot"><ul id="https://www.notion.so/cb23870388e54bfd8025c6d3ff1422b5" class="ColorfulBlock ColorfulBlock--ColorGray TableOfContents"><li class="TableOfContents__Item"><a href="#https://www.notion.so/4e7b30ecd1a64ff08f47460a30fcab00"><div style="margin-left:0px"><span class="SemanticStringArray"><span class="SemanticString">手写双向链表➕HashMap</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/904ad3f2fd154df5a912596e1623c761"><div style="margin-left:0px"><span class="SemanticStringArray"><span class="SemanticString">继承LInkedHashMap的方法</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/6cf5fca5188a46048dcd0bd0c1b815c4"><div style="margin-left:0px"><span class="SemanticStringArray"><span class="SemanticString">相关资料</span></span></div></a></li></ul><div id="https://www.notion.so/02ca0e2c75ac4b4a8657ea79492e7d8c" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">LRU的思想：将最近一次使用的时间作为衡量某个资源（如内存）的价值，最近一次使用的时间越久，它的价值就越小。</strong></span></span></p></div><div id="https://www.notion.so/ed047f2842174424bf216054177de6d8" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">即淘汰最近一次使用时间最长的数据。最久未使用的数据</span></span></p></div><div id="https://www.notion.so/25fbc0502af44fe49e2e7673783ae210" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"></span></p></div><div id="https://www.notion.so/d8d443ddc28c45cb8fe40776414488c7" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"></span></p></div><h1 id="https://www.notion.so/4e7b30ecd1a64ff08f47460a30fcab00" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/4e7b30ecd1a64ff08f47460a30fcab00"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">手写双向链表➕HashMap</span></span></h1><pre id="https://www.notion.so/c4156aa41e5a4b798fa0f3c4cf432a4f" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span><span class="token keyword">public</span> <span class="token class-name">LRUCache</span><span class="token punctuation">{</span>
+<span class="token comment">//双向链表NODE节点</span>
+	<span class="token keyword">public</span> <span class="token class-name">Node</span><span class="token punctuation">{</span>
+				<span class="token class-name">String</span> key<span class="token punctuation">;</span>
+        <span class="token keyword">int</span> value<span class="token punctuation">;</span>
+        <span class="token class-name">DLinkedNode</span> pre<span class="token punctuation">;</span>
+        <span class="token class-name">DLinkedNode</span> post<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token comment">//存储具体的数据</span>
+	<span class="token keyword">private</span> <span class="token class-name">ConcurrentMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">DLinkedNode</span><span class="token punctuation">></span></span> cache <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ConcurrentHashMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">DLinkedNode</span><span class="token punctuation">></span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token keyword">private</span> <span class="token keyword">int</span> count<span class="token punctuation">;</span>
+	<span class="token keyword">private</span> <span class="token keyword">int</span> capacity<span class="token punctuation">;</span>
+	<span class="token comment">//记录双向链表的头节点和尾节点</span>
+  <span class="token keyword">private</span> <span class="token class-name">DLinkedNode</span> head<span class="token punctuation">,</span> tail<span class="token punctuation">;</span>
+<span class="token comment">//构造方法，初始化头尾节点</span>
+	<span class="token keyword">public</span> <span class="token class-name">LRUCache</span><span class="token punctuation">(</span><span class="token keyword">int</span> capacity<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>count <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>capacity <span class="token operator">=</span> capacity<span class="token punctuation">;</span>
+
+        head <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">DLinkedNode</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        head<span class="token punctuation">.</span>pre <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+
+        tail <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">DLinkedNode</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        tail<span class="token punctuation">.</span>post <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+
+        head<span class="token punctuation">.</span>post <span class="token operator">=</span> tail<span class="token punctuation">;</span>
+        tail<span class="token punctuation">.</span>pre <span class="token operator">=</span> head<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token comment">//工具方法，将某个节点添加到头部</span>
+	<span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">addNode</span><span class="token punctuation">(</span><span class="token class-name">DLinkedNode</span> node<span class="token punctuation">)</span><span class="token punctuation">{</span>
+        node<span class="token punctuation">.</span>pre <span class="token operator">=</span> head<span class="token punctuation">;</span>
+        node<span class="token punctuation">.</span>post <span class="token operator">=</span> head<span class="token punctuation">.</span>post<span class="token punctuation">;</span>
+
+        head<span class="token punctuation">.</span>post<span class="token punctuation">.</span>pre <span class="token operator">=</span> node<span class="token punctuation">;</span>
+        head<span class="token punctuation">.</span>post <span class="token operator">=</span> node<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token comment">//工具方法 删除某个节点</span>
+    <span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">removeNode</span><span class="token punctuation">(</span><span class="token class-name">DLinkedNode</span> node<span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token class-name">DLinkedNode</span> pre <span class="token operator">=</span> node<span class="token punctuation">.</span>pre<span class="token punctuation">;</span>
+        <span class="token class-name">DLinkedNode</span> post <span class="token operator">=</span> node<span class="token punctuation">.</span>post<span class="token punctuation">;</span>
+
+        pre<span class="token punctuation">.</span>post <span class="token operator">=</span> post<span class="token punctuation">;</span>
+        post<span class="token punctuation">.</span>pre <span class="token operator">=</span> pre<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token comment">//工具方法 移动某个节点到头部</span>
+    <span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">moveToHead</span><span class="token punctuation">(</span><span class="token class-name">DLinkedNode</span> node<span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token function">removeNode</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">addNode</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token comment">//工具方法 删除尾部节点</span>
+    <span class="token keyword">private</span> <span class="token class-name">DLinkedNode</span> <span class="token function">popTail</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token class-name">DLinkedNode</span> res <span class="token operator">=</span> tail<span class="token punctuation">.</span>pre<span class="token punctuation">;</span>
+        <span class="token function">removeNode</span><span class="token punctuation">(</span>res<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> res<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token comment">//get方法，会更新双向链表中的数据</span>
+	<span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">get</span><span class="token punctuation">(</span><span class="token class-name">String</span> key<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">DLinkedNode</span> node <span class="token operator">=</span> cache<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>node <span class="token operator">==</span> <span class="token keyword">null</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span> <span class="token comment">// should raise exception here.</span>
+        <span class="token punctuation">}</span>
+        <span class="token function">moveToHead</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> node<span class="token punctuation">.</span>value<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+<span class="token comment">//put方法，会检查容量值</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">put</span><span class="token punctuation">(</span><span class="token class-name">String</span> key<span class="token punctuation">,</span> <span class="token keyword">int</span> value<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">DLinkedNode</span> node <span class="token operator">=</span> cache<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>node <span class="token operator">!=</span> <span class="token keyword">null</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            node<span class="token punctuation">.</span>value <span class="token operator">=</span> value<span class="token punctuation">;</span>
+            <span class="token function">moveToHead</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token class-name">DLinkedNode</span> newNode <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">DLinkedNode</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        newNode<span class="token punctuation">.</span>key <span class="token operator">=</span> key<span class="token punctuation">;</span>
+        newNode<span class="token punctuation">.</span>value <span class="token operator">=</span> value<span class="token punctuation">;</span>
+
+        cache<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> newNode<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">addNode</span><span class="token punctuation">(</span>newNode<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token operator">++</span>count<span class="token punctuation">;</span>
+
+        <span class="token keyword">if</span><span class="token punctuation">(</span>count <span class="token operator">></span> capacity<span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token comment">// pop the tail</span>
+            <span class="token class-name">DLinkedNode</span> tail <span class="token operator">=</span> <span class="token function">popTail</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            cache<span class="token punctuation">.</span><span class="token function">remove</span><span class="token punctuation">(</span>tail<span class="token punctuation">.</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token operator">--</span>count<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+<span class="token punctuation">}</span></span></span></span></code></pre><div id="https://www.notion.so/713be4375a1d41da87c986558fc048ee" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"></span></p></div><h1 id="https://www.notion.so/904ad3f2fd154df5a912596e1623c761" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/904ad3f2fd154df5a912596e1623c761"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">继承LInkedHashMap的方法</span></span></h1><pre id="https://www.notion.so/a5449a49343345bda537346fd391d1b1" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">LinkedListLRU</span> <span class="token keyword">extends</span> <span class="token class-name">LinkedHashMap</span> <span class="token punctuation">{</span>
+    <span class="token keyword">private</span> <span class="token keyword">int</span> capacity<span class="token punctuation">;</span>
+		<span class="token comment">/**
+     * 当LinkedHashMap的accessOrder参数为true时，即会按照访问顺序排序，最近访问的放在最前，最早访问的放在后面
+     */</span>
+    <span class="token keyword">public</span> <span class="token class-name">LinkedListLRU</span><span class="token punctuation">(</span><span class="token keyword">int</span> capacity<span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">super</span><span class="token punctuation">(</span>capacity<span class="token punctuation">,</span> <span class="token number">0.75f</span><span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>capacity <span class="token operator">=</span> capacity<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+		<span class="token comment">/**
+     * LinkedHashMap自带的判断是否删除最老的元素方法，默认返回false，即不删除老数据
+     */</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">protected</span> <span class="token keyword">boolean</span> <span class="token function">removeEldestEntry</span><span class="token punctuation">(</span><span class="token class-name">Map<span class="token punctuation">.</span>Entry</span> eldest<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">></span>capacity<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></span></span></span></code></pre><h1 id="https://www.notion.so/6cf5fca5188a46048dcd0bd0c1b815c4" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/6cf5fca5188a46048dcd0bd0c1b815c4"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">相关资料</span></span></h1><div id="https://www.notion.so/c33eaa59b2a84f5abf04a2a2fecb1700" class="Bookmark"><a href="https://juejin.cn/post/6989206903481958414"><h5 class="Bookmark__Title">从leetcode真题讲解手写LRU算法 - 掘金</h5><p class="Bookmark__Desc">前言 大家好，我是jack xu，大家不管是在刷leetcode的时候让你手写LRU算法，还是面试中让你手写LRU算法，都会碰到LRU算法。不管是为了应付面试还是平时工作中用的到，都是你学习本文的动力</p><p class="Bookmark__Link">https://juejin.cn/post/6989206903481958414</p></a></div><div id="https://www.notion.so/7d79ed09da2248048f7c6098ef200129" class="Bookmark"><a href="https://blog.csdn.net/a745233700/article/details/113487239"><h5 class="Bookmark__Title">使用LinkedHashMap实现LRU算法_张维鹏的博客-CSDN博客</h5><p class="Bookmark__Desc">LRU算法，最近最少使用原则，如果要实现该算法，可以借助LinkedHashMap数据结构，LinkedHashMap继承HashMap，底层使用哈希表和双向链表来保存所有元素，使用LinkedHashMap可以确保元素按照顺序进行存储。默认情况下，LinkedHashMap是按照元素的添加顺序存储，也可以启用按照访问顺序存储，即最近读取的数据放在最前面，最早读取的数据放在最后面，然后它还有一个判断是否删除最老数据的方法，默认是返回false，即不删除数据。下面就基于这两种存储方式，简单展示一下如何_linkedhashmap实现lru</p><p class="Bookmark__Link">https://blog.csdn.net/a745233700/article/details/113487239</p></a></div></article>
+  <footer class="Footer">
+  <div>&copy; 沂风 2022</div>
+  <div>&centerdot;</div>
+  <div>Powered by <a href="https://github.com/dragonman225/notablog" target="_blank"
+      rel="noopener noreferrer">Notablog</a>.
+  </div>
+</footer>
+</body>
+
+</html>
