@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- iOS Safari -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- Chrome, Firefox OS and Opera Status Bar Color -->
+<meta name="theme-color" content="#FFFFFF">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css">
+<link rel="stylesheet" type="text/css"
+  href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/themes/prism.min.css">
+<link rel="stylesheet" type="text/css" href="css/SourceSansPro.css">
+<link rel="stylesheet" type="text/css" href="css/theme.css">
+<link rel="stylesheet" type="text/css" href="css/notablog.css">
+<!-- Favicon -->
+
+<style>
+  :root {
+    font-size: 20px;
+  }
+</style>
+  <title>String,String Buffer,String Builder&nbsp;|&nbsp;沂风</title>
+  <meta property="og:type" content="blog">
+  <meta property="og:title" content="String,String Buffer,String Builder">
+  
+    <meta name="description" content="回归最初，看一看StringBuffer和StringBuilder的底层">
+    <meta property="og:description" content="回归最初，看一看StringBuffer和StringBuilder的底层">
+  
+  
+    <meta property="og:image" content="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;🧿&lt;/text&gt;&lt;/svg&gt;">
+  
+  <style>
+    .DateTagBar {
+      margin-top: 1.0rem;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="Navbar">
+  <a href="index.html">
+    <div class="Navbar__Btn">
+      
+      <span>Home</span>
+    </div>
+  </a>
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <span class="Navbar__Delim">&centerdot;</span>
+      <a href="about.html">
+        <div class="Navbar__Btn">
+          
+            <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;😀&lt;/text&gt;&lt;/svg&gt;"></span>&nbsp;
+          
+          <span>关于</span>
+        </div>
+      </a>
+    
+  
+</nav>
+  <header class="Header">
+    
+      <div class="Header__Cover">
+        <img src="https://www.notion.so/images/page-cover/met_william_morris_1878.jpg">
+      </div>
+    
+    <div class="Header__Spacer ">
+    </div>
+    
+      <div class="Header__Icon">
+        <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;🧿&lt;/text&gt;&lt;/svg&gt;"></span>
+      </div>
+    
+    <h1 class="Header__Title">String,String Buffer,String Builder</h1>
+    
+      <div class="DateTagBar">
+        
+          <span class="DateTagBar__Item DateTagBar__Date">Posted on Fri, Sep 15, 2023</span>
+        
+        
+          <span class="DateTagBar__Item DateTagBar__Tag DateTagBar__Tag--blue">
+            <a href="tag/Java.html">Java</a>
+          </span>
+        
+      </div>
+    
+  </header>
+  <article id="https://www.notion.so/e7bfe1fe3dc24bac8c8186f7c9a8f8c3" class="PageRoot"><ul id="https://www.notion.so/54531b5bd85143438b48f4e42c126953" class="ColorfulBlock ColorfulBlock--ColorGray TableOfContents"><li class="TableOfContents__Item"><a href="#https://www.notion.so/0cebf10e15294ba88aa29b29153392a1"><div style="margin-left:0px"><span class="SemanticStringArray"><span class="SemanticString">FInal</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/f1f93ed6bf824142a95c97e39bb8a287"><div style="margin-left:24px"><span class="SemanticStringArray"><span class="SemanticString">String 声明为 final 的，也就是不可以被继承</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/bb660b08f5d94807b2f4afc693145c9c"><div style="margin-left:24px"><span class="SemanticStringArray"><span class="SemanticString">String 在内部定义了 final 的 char 型数组，用于存储字符串数组</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/7ddb76598d9d47d582057f432109c487"><div style="margin-left:24px"><span class="SemanticStringArray"><span class="SemanticString">String 不可变性体现在： 当对字符串重新赋值时，需要重写指定内存区域赋值，不能使用原有的 value 进行赋值。当对现有字符串进行连接操作时，需要重新赋值，不能在原有基础上赋值</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/0afd8eb16c864657b4bc7706e651d173"><div style="margin-left:0px"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">StringBuilder</strong></strong></span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/289ebcd62bda4202af9b598661cad6da"><div style="margin-left:24px"><span class="SemanticStringArray"><span class="SemanticString">假设在单线程环境中或无关线程安全，要使用 StringBuilder ，因为 StringBuilder 运行速度最快。</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/2728fc67264348369d3c14434c695db6"><div style="margin-left:24px"><span class="SemanticStringArray"><span class="SemanticString">和 String 类不同，StringBuffer 和 StringBuilder 类的对象能够被多次的修改，并且不产生新的未使用对象；</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/2fe759d002cd4af886fbff192059ee26"><div style="margin-left:0px"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">StringBuffer</strong></strong></span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/ab8f3db28bfe486fb9a9f369bfc64724"><div style="margin-left:24px"><span class="SemanticStringArray"><span class="SemanticString">StringBuffer 的所有公开方法都是 synchronized 修饰的，而 StringBuilder 并没有</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/25e91d98e53941e0a2c700e3f73f07a6"><div style="margin-left:0px"><span class="SemanticStringArray"><span class="SemanticString">StringBuffer与</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">StringBuilder</strong></strong></span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/551e184663344330acd9bf3a9ad840b2"><div style="margin-left:24px"><span class="SemanticStringArray"><span class="SemanticString">底层都是用char[]字符数组实现，且字符数组都是可变的，这点不同于String</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/5360f37b39a64780b43a2e836e9aef91"><div style="margin-left:24px"><span class="SemanticStringArray"><span class="SemanticString">都继成了AbstractStringBuilder这个抽象类，实现了CharSequence接口</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/8f5a3f114fc74104b4b430d8ae99682d"><div style="margin-left:24px"><span class="SemanticStringArray"><span class="SemanticString">其append方法都是 super.append(str)，调用了父类AbstractStringBuilder的append(String str)方法</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/0c87221ce5eb48fbbfa48140397c7112"><div style="margin-left:24px"><span class="SemanticStringArray"><span class="SemanticString">因为继承的是同一个抽象类，所以两者的append操作都是由抽象类实现的</span></span></div></a></li></ul><div id="https://www.notion.so/8bac8d0e2d1340f88da0c679a6bba452" class="Image Image--PageWidth"><figure><a href="https://prod-files-secure.s3.us-west-2.amazonaws.com/97f60ed7-2f91-4328-9e16-bcc075d7c8a7/38aeef3a-92d4-4728-95e5-f959dc45e153/Untitled.png?width=1415"><img src="https://prod-files-secure.s3.us-west-2.amazonaws.com/97f60ed7-2f91-4328-9e16-bcc075d7c8a7/38aeef3a-92d4-4728-95e5-f959dc45e153/Untitled.png?width=1415" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><h1 id="https://www.notion.so/0cebf10e15294ba88aa29b29153392a1" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/0cebf10e15294ba88aa29b29153392a1"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">FInal</span></span></h1><h3 id="https://www.notion.so/f1f93ed6bf824142a95c97e39bb8a287" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/f1f93ed6bf824142a95c97e39bb8a287"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">String 声明为 final 的，也就是不可以被继承</span></span></h3><h3 id="https://www.notion.so/bb660b08f5d94807b2f4afc693145c9c" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/bb660b08f5d94807b2f4afc693145c9c"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">String 在内部定义了 final 的 char 型数组，用于存储字符串数组</span></span></h3><h3 id="https://www.notion.so/7ddb76598d9d47d582057f432109c487" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/7ddb76598d9d47d582057f432109c487"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">String 不可变性体现在： 当对字符串重新赋值时，需要重写指定内存区域赋值，不能使用原有的 value 进行赋值。当对现有字符串进行连接操作时，需要重新赋值，不能在原有基础上赋值</span></span></h3><h1 id="https://www.notion.so/0afd8eb16c864657b4bc7706e651d173" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/0afd8eb16c864657b4bc7706e651d173"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">StringBuilder</strong></strong></span></span></h1><h3 id="https://www.notion.so/289ebcd62bda4202af9b598661cad6da" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/289ebcd62bda4202af9b598661cad6da"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">假设在单线程环境中或无关线程安全，要使用 StringBuilder ，因为 StringBuilder 运行速度最快。</span></span></h3><h3 id="https://www.notion.so/2728fc67264348369d3c14434c695db6" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/2728fc67264348369d3c14434c695db6"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">和 String 类不同，StringBuffer 和 StringBuilder 类的对象能够被多次的修改，并且不产生新的未使用对象；</span></span></h3><h1 id="https://www.notion.so/2fe759d002cd4af886fbff192059ee26" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/2fe759d002cd4af886fbff192059ee26"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">StringBuffer</strong></strong></span></span></h1><h3 id="https://www.notion.so/ab8f3db28bfe486fb9a9f369bfc64724" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/ab8f3db28bfe486fb9a9f369bfc64724"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">StringBuffer 的所有公开方法都是 synchronized 修饰的，而 StringBuilder 并没有</span></span></h3><pre id="https://www.notion.so/c88d557b87284ece89d47614187cdcd3" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span><span class="token annotation punctuation">@Override</span>
+<span class="token keyword">public</span> <span class="token keyword">synchronized</span> <span class="token class-name">StringBuffer</span> <span class="token function">append</span><span class="token punctuation">(</span><span class="token class-name">String</span> str<span class="token punctuation">)</span><span class="token punctuation">{</span>
+    
+    toStringCache <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+    <span class="token keyword">super</span><span class="token punctuation">.</span><span class="token function">append</span><span class="token punctuation">(</span>str<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">;</span>
+
+<span class="token punctuation">}</span></span></span></span></code></pre><h1 id="https://www.notion.so/25e91d98e53941e0a2c700e3f73f07a6" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/25e91d98e53941e0a2c700e3f73f07a6"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">StringBuffer与</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">StringBuilder</strong></strong></span></span></h1><pre id="https://www.notion.so/04c790510747483f927b93f7e10f26d8" class="Code Code--NoWrap"><code><span class="SemanticStringArray"><span class="SemanticString"><span><span class="token comment">// StringBuffer 转换成 StringBuilder</span>
+<span class="token class-name">StringBuilder</span> bufferToBuilder <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">StringBuilder</span><span class="token punctuation">(</span>sbf<span class="token punctuation">.</span>toString<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// StringBuilder 转换成 StringBuffer</span>
+<span class="token class-name">StringBuffer</span> builderToBuffer <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">StringBuffer</span><span class="token punctuation">(</span>sbd<span class="token punctuation">.</span>toString<span class="token punctuation">)</span><span class="token punctuation">;</span></span></span></span></code></pre><h3 id="https://www.notion.so/551e184663344330acd9bf3a9ad840b2" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/551e184663344330acd9bf3a9ad840b2"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">底层都是用char[]字符数组实现，且字符数组都是可变的，这点不同于String</span></span></h3><h3 id="https://www.notion.so/5360f37b39a64780b43a2e836e9aef91" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/5360f37b39a64780b43a2e836e9aef91"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">都继成了AbstractStringBuilder这个抽象类，实现了CharSequence接口</span></span></h3><h3 id="https://www.notion.so/8f5a3f114fc74104b4b430d8ae99682d" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/8f5a3f114fc74104b4b430d8ae99682d"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">其append方法都是 super.append(str)，调用了父类AbstractStringBuilder的append(String str)方法</span></span></h3><h3 id="https://www.notion.so/0c87221ce5eb48fbbfa48140397c7112" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/0c87221ce5eb48fbbfa48140397c7112"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">因为继承的是同一个抽象类，所以两者的append操作都是由抽象类实现的</span></span></h3></article>
+  <footer class="Footer">
+  <div>&copy; 沂风 2022</div>
+  <div>&centerdot;</div>
+  <div>Powered by <a href="https://github.com/dragonman225/notablog" target="_blank"
+      rel="noopener noreferrer">Notablog</a>.
+  </div>
+</footer>
+</body>
+
+</html>

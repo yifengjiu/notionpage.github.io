@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- iOS Safari -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- Chrome, Firefox OS and Opera Status Bar Color -->
+<meta name="theme-color" content="#FFFFFF">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css">
+<link rel="stylesheet" type="text/css"
+  href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/themes/prism.min.css">
+<link rel="stylesheet" type="text/css" href="css/SourceSansPro.css">
+<link rel="stylesheet" type="text/css" href="css/theme.css">
+<link rel="stylesheet" type="text/css" href="css/notablog.css">
+<!-- Favicon -->
+
+<style>
+  :root {
+    font-size: 20px;
+  }
+</style>
+  <title>Bean的生命周期 &nbsp;|&nbsp;沂风</title>
+  <meta property="og:type" content="blog">
+  <meta property="og:title" content="Bean的生命周期 ">
+  
+    <meta name="description" content="重新整理下Bean的生命周期">
+    <meta property="og:description" content="重新整理下Bean的生命周期">
+  
+  
+    <meta property="og:image" content="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;📤&lt;/text&gt;&lt;/svg&gt;">
+  
+  <style>
+    .DateTagBar {
+      margin-top: 1.0rem;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="Navbar">
+  <a href="index.html">
+    <div class="Navbar__Btn">
+      
+      <span>Home</span>
+    </div>
+  </a>
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <span class="Navbar__Delim">&centerdot;</span>
+      <a href="about.html">
+        <div class="Navbar__Btn">
+          
+            <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;😀&lt;/text&gt;&lt;/svg&gt;"></span>&nbsp;
+          
+          <span>关于</span>
+        </div>
+      </a>
+    
+  
+</nav>
+  <header class="Header">
+    
+      <div class="Header__Cover">
+        <img src="https://www.notion.so/images/page-cover/met_john_singer_sargent_morocco.jpg">
+      </div>
+    
+    <div class="Header__Spacer ">
+    </div>
+    
+      <div class="Header__Icon">
+        <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;📤&lt;/text&gt;&lt;/svg&gt;"></span>
+      </div>
+    
+    <h1 class="Header__Title">Bean的生命周期 </h1>
+    
+      <div class="DateTagBar">
+        
+          <span class="DateTagBar__Item DateTagBar__Date">Posted on Sat, Sep 16, 2023</span>
+        
+        
+          <span class="DateTagBar__Item DateTagBar__Tag DateTagBar__Tag--purple">
+            <a href="tag/spring.html">spring</a>
+          </span>
+        
+      </div>
+    
+  </header>
+  <article id="https://www.notion.so/9fc3ea79f04145869c558810e4fa58da" class="PageRoot"><ul id="https://www.notion.so/fc10237dbf684e9b923b25f002b74228" class="ColorfulBlock ColorfulBlock--ColorGray TableOfContents"><li class="TableOfContents__Item"><a href="#https://www.notion.so/5ef303b35bfe4f8189895f0871175f8b"><div style="margin-left:0px"><span class="SemanticStringArray"><span class="SemanticString">Bean包括用户自定义bean和系统Bean</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/63e4998c8ae74094a1a73cd3f0863259"><div style="margin-left:0px"><span class="SemanticStringArray"><span class="SemanticString">主要生命阶段概括</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/b4d2af6f6d2743ca99b7723ca359b07a"><div style="margin-left:0px"><span class="SemanticStringArray"><span class="SemanticString">阶段一：生产Bean对象（创建Bean对象）</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/97042202f4474a98a851c208ba98e06a"><div style="margin-left:24px"><span class="SemanticStringArray"><span class="SemanticString">加载BeanDefinations（bean定义，通过LoadBeanDefinations方法），到beanDefinaitionMap中</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/b33a0090ed474c9585fa0cd6bba117f4"><div style="margin-left:24px"><span class="SemanticStringArray"><span class="SemanticString">遍历集合，利用createBean方法创建Bean对象</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/502f4c78e8e44d988bd455b908e01060"><div style="margin-left:48px"><span class="SemanticStringArray"><span class="SemanticString">构造对象</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/f6a83e320c744c468ecba1e2e654d83e"><div style="margin-left:48px"><span class="SemanticStringArray"><span class="SemanticString">填充属性</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/8602fbbb4c9847ff97ff36de55f10dd8"><div style="margin-left:48px"><span class="SemanticStringArray"><span class="SemanticString">初始化实例</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/c652385159c84870ae43838ca2931cdd"><div style="margin-left:48px"><span class="SemanticStringArray"><span class="SemanticString">注册销毁</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/49c3e82dc322401e9a5b348243a7769a"><div style="margin-left:24px"><span class="SemanticStringArray"><span class="SemanticString"> 利用addSingletion方法将该Bean放入单例池</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/36cc81809eeb4eada48cf281d156b02f"><div style="margin-left:0px"><span class="SemanticStringArray"><span class="SemanticString">阶段二：实例化后回调</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/eef49625075248ea89a53e810ba70676"><div style="margin-left:0px"><span class="SemanticStringArray"><span class="SemanticString">阶段三：实例销毁</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/13b6b78258f444dfb8a4b90c8c3f3402"><div style="margin-left:24px"><span class="SemanticStringArray"><span class="SemanticString">执行客户销毁方法 ，调用自定义的destoryMethods方法</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/5018c7b68d144cd9b441caaa435cc314"><div style="margin-left:0px"><span class="SemanticStringArray"><span class="SemanticString">在销毁时，也会执行销毁前处理器和销毁后处理器的相关方法</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/8880a321a1c14d539e500885018955b6"><div style="margin-left:0px"><span class="SemanticStringArray"><span class="SemanticString">参考文档</span></span></div></a></li></ul><h1 id="https://www.notion.so/5ef303b35bfe4f8189895f0871175f8b" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/5ef303b35bfe4f8189895f0871175f8b"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">Bean包括用户自定义bean和系统Bean</span></span></h1><h1 id="https://www.notion.so/63e4998c8ae74094a1a73cd3f0863259" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/63e4998c8ae74094a1a73cd3f0863259"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">主要生命阶段概括</span></span></h1><div id="https://www.notion.so/0f6fb3ad4c104765b7f8b6f23eac9e3e" class="Image Image--Normal"><figure><a href="https://www.notion.so/signed/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F596129f0-7a47-4d92-8c14-5dbb0732a361%2FUntitled.png?width=1104&amp;table=block&amp;id=0f6fb3ad-4c10-4765-b7f8-b6f23eac9e3e"><img src="https://www.notion.so/signed/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F596129f0-7a47-4d92-8c14-5dbb0732a361%2FUntitled.png?width=1104&amp;table=block&amp;id=0f6fb3ad-4c10-4765-b7f8-b6f23eac9e3e" style="width:1104px"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><div id="https://www.notion.so/d5b21368038a4a908b1a0d55a5dee183" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"></span></p></div><div id="https://www.notion.so/27f288bd7fa943c7a5fd982431c7313d" class="Image Image--PageWidth"><figure><a href="https://www.notion.so/signed/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2Fa799d8b7-ea83-4c20-9058-a779b197e77e%2FUntitled.png?width=1562&amp;table=block&amp;id=27f288bd-7fa9-43c7-a5fd-982431c7313d"><img src="https://www.notion.so/signed/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2Fa799d8b7-ea83-4c20-9058-a779b197e77e%2FUntitled.png?width=1562&amp;table=block&amp;id=27f288bd-7fa9-43c7-a5fd-982431c7313d" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><div id="https://www.notion.so/ee6fc39fe49d46d88f0e68a434108290" class="Image Image--PageWidth"><figure><a href="https://www.notion.so/signed/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F82eb7a00-0385-401f-8cb0-2448993c0702%2FUntitled.png?width=1564&amp;table=block&amp;id=ee6fc39f-e49d-46d8-8f0e-68a434108290"><img src="https://www.notion.so/signed/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F82eb7a00-0385-401f-8cb0-2448993c0702%2FUntitled.png?width=1564&amp;table=block&amp;id=ee6fc39f-e49d-46d8-8f0e-68a434108290" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><h1 id="https://www.notion.so/b4d2af6f6d2743ca99b7723ca359b07a" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/b4d2af6f6d2743ca99b7723ca359b07a"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">阶段一：生产Bean对象（创建Bean对象）</span></span></h1><h2 id="https://www.notion.so/97042202f4474a98a851c208ba98e06a" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/97042202f4474a98a851c208ba98e06a"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">加载BeanDefinations（bean定义，通过LoadBeanDefinations方法），到beanDefinaitionMap中</span></span></h2><h2 id="https://www.notion.so/b33a0090ed474c9585fa0cd6bba117f4" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/b33a0090ed474c9585fa0cd6bba117f4"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">遍历集合，利用createBean方法创建Bean对象</span></span></h2><h3 id="https://www.notion.so/502f4c78e8e44d988bd455b908e01060" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/502f4c78e8e44d988bd455b908e01060"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">构造对象</span></span></h3><div id="https://www.notion.so/89282dd4539442d8a477286f39f1e829" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">调用createBeanInstance方法 创建Bean对象，内部利用反射拿到Bean的构造方法</span></span></p></div><div id="https://www.notion.so/862bd7bf7e864823b1a5abc38700b5de" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">根据构造方法需要的参数，在单例池中寻找相应的bean对象</span></span></p></div><div id="https://www.notion.so/6c39fc0b3bc44785b336e97cd073db92" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">最终利用反射构造相应的bean</span></span></p></div><h3 id="https://www.notion.so/f6a83e320c744c468ecba1e2e654d83e" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/f6a83e320c744c468ecba1e2e654d83e"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">填充属性</span></span></h3><div id="https://www.notion.so/371da3a322b34c51a0049f3cc154a628" class="Image Image--PageWidth"><figure><a href="https://www.notion.so/signed/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F99f2889c-c491-462b-a15d-1837b795f3f3%2FUntitled.png?width=1784&amp;table=block&amp;id=371da3a3-22b3-4c51-a004-9f3cc154a628"><img src="https://www.notion.so/signed/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F99f2889c-c491-462b-a15d-1837b795f3f3%2FUntitled.png?width=1784&amp;table=block&amp;id=371da3a3-22b3-4c51-a004-9f3cc154a628" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><div id="https://www.notion.so/89a55c5158de4c379fdaab1373b9567a" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">利用populateBean方法对Bean内的属性进行填充（主要是@Autowired标注的），这里会用到三级缓存</span></span></p></div><h3 id="https://www.notion.so/8602fbbb4c9847ff97ff36de55f10dd8" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/8602fbbb4c9847ff97ff36de55f10dd8"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">初始化实例</span></span></h3><div id="https://www.notion.so/60996b9712a449e4bcff3ab7ca7e5f0b" class="Image Image--Normal"><figure><a href="https://www.notion.so/signed/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F43ff029b-1459-4cce-b8f9-1cfc80c54455%2FUntitled.png?width=604&amp;table=block&amp;id=60996b97-12a4-49e4-bcff-3ab7ca7e5f0b"><img src="https://www.notion.so/signed/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F43ff029b-1459-4cce-b8f9-1cfc80c54455%2FUntitled.png?width=604&amp;table=block&amp;id=60996b97-12a4-49e4-bcff-3ab7ca7e5f0b" style="width:604px"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><div id="https://www.notion.so/1c55c91de448405c9b781f46a69baf53" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">使用initializeBean方法，调用invokeAwareMethods方法，对实现相应Aware接口的类添加相应的属性</span></span></p></div><div id="https://www.notion.so/ffe9723ffe8946b3a47f263c8c275e68" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">调用invokeInitMethods方法，对实现InitailizingBean接口的类调用相应的方法（实现的afterPropertiesSet方法）</span></span></p></div><div id="https://www.notion.so/eb8160a664bf459eb4b97b718e004ab7" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">在执行默认的初始化方法后，还会继续执行自定义的initMethod方法</span></span></p></div><div id="https://www.notion.so/6f17c9ea04a143b8a2ca17d279c81dcc" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">在invokeinitMethods接口定义的afterPropertiesSet前后，使用前置处理器和后置处理器</span></span></p></div><div id="https://www.notion.so/e0acd0597848433e938dde023db7d949" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">这些处理器就包括AOP处理器等系统级处理器，当然也包括自定义的处理器</span></span></p></div><h3 id="https://www.notion.so/c652385159c84870ae43838ca2931cdd" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/c652385159c84870ae43838ca2931cdd"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">注册销毁</span></span></h3><div id="https://www.notion.so/f5e97f60c6c0401385cb3a2695c1fc55" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">利用registerDisposableBean方法将实现了销毁接口（DisposableBean）的Bean进行注册</span></span></p></div><h2 id="https://www.notion.so/49c3e82dc322401e9a5b348243a7769a" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/49c3e82dc322401e9a5b348243a7769a"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString"> 利用addSingletion方法将该Bean放入单例池</span></span></h2><div id="https://www.notion.so/b597667250494bd28affeb94826ad5cd" class="Image Image--PageWidth"><figure><a href="https://www.notion.so/signed/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F81264529-2722-48b1-b755-8d193814c578%2FUntitled.png?width=1564&amp;table=block&amp;id=b5976672-5049-4bd2-8aff-eb94826ad5cd"><img src="https://www.notion.so/signed/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F81264529-2722-48b1-b755-8d193814c578%2FUntitled.png?width=1564&amp;table=block&amp;id=b5976672-5049-4bd2-8aff-eb94826ad5cd" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><h1 id="https://www.notion.so/36cc81809eeb4eada48cf281d156b02f" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/36cc81809eeb4eada48cf281d156b02f"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">阶段二：实例化后回调</span></span></h1><div id="https://www.notion.so/d32fe05e08464c9d9489dca42772fa6b" class="Image Image--PageWidth"><figure><a href="https://www.notion.so/signed/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F6c24fb4b-7bf3-47da-9e0a-266053cd4434%2FUntitled.png?width=1520&amp;table=block&amp;id=d32fe05e-0846-4c9d-9489-dca42772fa6b"><img src="https://www.notion.so/signed/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F6c24fb4b-7bf3-47da-9e0a-266053cd4434%2FUntitled.png?width=1520&amp;table=block&amp;id=d32fe05e-0846-4c9d-9489-dca42772fa6b" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><h1 id="https://www.notion.so/eef49625075248ea89a53e810ba70676" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/eef49625075248ea89a53e810ba70676"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">阶段三：实例销毁</span></span></h1><div id="https://www.notion.so/1e8a4f6df3e04e12b540a2cd4cfd0286" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">在销毁前会执行前置处理器，回调用Bean中被注解的销毁方法</span></span></p></div><div id="https://www.notion.so/f4bcd194692c403b995a173e79b34d75" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">调用DestoyBean方法销毁bean</span></span></p></div><h3 id="https://www.notion.so/13b6b78258f444dfb8a4b90c8c3f3402" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/13b6b78258f444dfb8a4b90c8c3f3402"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">执行客户销毁方法 ，调用自定义的destoryMethods方法</span></span></h3><h2 id="https://www.notion.so/5018c7b68d144cd9b441caaa435cc314" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/5018c7b68d144cd9b441caaa435cc314"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">在销毁时，也会执行销毁前处理器和销毁后处理器的相关方法</span></span></h2><div id="https://www.notion.so/c285683b02e64d51bb767007bf78b981" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"></span></p></div><div id="https://www.notion.so/7151f3ba14a44e248bbaca13bd67f77d" class="Image Image--PageWidth"><figure><a href="https://www.notion.so/signed/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2Fe3b18f17-9434-44cb-9db1-b176f5221c2f%2FUntitled.png?width=946&amp;table=block&amp;id=7151f3ba-14a4-4e24-8bba-ca13bd67f77d"><img src="https://www.notion.so/signed/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2Fe3b18f17-9434-44cb-9db1-b176f5221c2f%2FUntitled.png?width=946&amp;table=block&amp;id=7151f3ba-14a4-4e24-8bba-ca13bd67f77d" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><h1 id="https://www.notion.so/8880a321a1c14d539e500885018955b6" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/8880a321a1c14d539e500885018955b6"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">参考文档</span></span></h1><div id="https://www.notion.so/da0240a19b734e88837e57e334d48530" class="Bookmark"><a href="https://segmentfault.com/a/1190000020747302"><h5 class="Bookmark__Title">Spring Bean 生命周期 （实例结合源码彻底讲透）</h5><p class="Bookmark__Desc">在应用开发中，常常需要执行一些特定的初始化工作，这些工作都是相对比较固定的，比如建立数据库连接，打开网络连接等，同时，在结束服务时，也有一些相对固...</p><p class="Bookmark__Link">https://segmentfault.com/a/1190000020747302</p></a></div><div id="https://www.notion.so/6b310f577e0449d58fb5c04761fc72bf" class="Bookmark"><a href="https://www.bilibili.com/video/BV1584y1r7n6/?spm_id_from=333.337.search-card.all.click&amp;vd_source=4fd046f5fdf2d1cf163f78d35844a2b6"><h5 class="Bookmark__Title">史上最完整的Spring Bean的生命周期_哔哩哔哩_bilibili</h5><p class="Bookmark__Desc">我是Spring，根据大家的反馈，本视频把Spring Bean最完整的生命周期介绍给大家这个视频可以当作学习目录，后续将逐个模块去详细介绍, 视频播放量 79152、弹幕量 519、点赞数 2941、投硬币枚数 2265、收藏人数 5057、转发人数 334, 视频作者 猿人林克, 作者简介 头部招聘平台技术总监+架构，深知各厂简历筛选策略 私我「优化简历」，时间有限，每周最多3份，暂限0-3年技术岗，相关视频：Spring Bean 的生命周期，应该如何回答，让面试官眼前一亮！【Java面试】，【刷题机器】什么是bean的生命周期？，spring-Bean的生命周期学习梳理，面试官觉得你基本功扎实，B站目前讲的最透彻的SpringBoot自动配置，大厂面试必备知识点#安员外很有码，如何叙述Spring Bean 的生命周期，让面试官眼前一亮！，请描述一下Spring Bean的生命周期？，阿里面试题：简述spring bean生命周期？，Spring中Bean的生命周期是怎样的？，为什么Spring官方不推荐使用@Autowired属性注入</p><p class="Bookmark__Link">https://www.bilibili.com/video/BV1584y1r7n6/?spm_id_from=333.337.search-card.all.click&amp;vd_source=4fd046f5fdf2d1cf163f78d35844a2b6</p></a></div></article>
+  <footer class="Footer">
+  <div>&copy; 沂风 2022</div>
+  <div>&centerdot;</div>
+  <div>Powered by <a href="https://github.com/dragonman225/notablog" target="_blank"
+      rel="noopener noreferrer">Notablog</a>.
+  </div>
+</footer>
+</body>
+
+</html>
