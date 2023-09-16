@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- iOS Safari -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- Chrome, Firefox OS and Opera Status Bar Color -->
+<meta name="theme-color" content="#FFFFFF">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css">
+<link rel="stylesheet" type="text/css"
+  href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/themes/prism.min.css">
+<link rel="stylesheet" type="text/css" href="css/SourceSansPro.css">
+<link rel="stylesheet" type="text/css" href="css/theme.css">
+<link rel="stylesheet" type="text/css" href="css/notablog.css">
+<!-- Favicon -->
+
+<style>
+  :root {
+    font-size: 20px;
+  }
+</style>
+  <title>为什么可重复读的隔离级别没有完全解决幻读&nbsp;|&nbsp;沂风</title>
+  <meta property="og:type" content="blog">
+  <meta property="og:title" content="为什么可重复读的隔离级别没有完全解决幻读">
+  
+    <meta name="description" content="面试遇到的问题，彻底解决下">
+    <meta property="og:description" content="面试遇到的问题，彻底解决下">
+  
+  
+    <meta property="og:image" content="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;🪥&lt;/text&gt;&lt;/svg&gt;">
+  
+  <style>
+    .DateTagBar {
+      margin-top: 1.0rem;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="Navbar">
+  <a href="index.html">
+    <div class="Navbar__Btn">
+      
+      <span>Home</span>
+    </div>
+  </a>
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <span class="Navbar__Delim">&centerdot;</span>
+      <a href="about.html">
+        <div class="Navbar__Btn">
+          
+            <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;😀&lt;/text&gt;&lt;/svg&gt;"></span>&nbsp;
+          
+          <span>关于</span>
+        </div>
+      </a>
+    
+  
+</nav>
+  <header class="Header">
+    
+      <div class="Header__Cover">
+        <img src="https://www.notion.so/images/page-cover/met_georges_seurat_1884.jpg">
+      </div>
+    
+    <div class="Header__Spacer ">
+    </div>
+    
+      <div class="Header__Icon">
+        <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;🪥&lt;/text&gt;&lt;/svg&gt;"></span>
+      </div>
+    
+    <h1 class="Header__Title">为什么可重复读的隔离级别没有完全解决幻读</h1>
+    
+      <div class="DateTagBar">
+        
+          <span class="DateTagBar__Item DateTagBar__Date">Posted on Sat, Sep 16, 2023</span>
+        
+        
+          <span class="DateTagBar__Item DateTagBar__Tag DateTagBar__Tag--purple">
+            <a href="tag/spring.html">spring</a>
+          </span>
+        
+      </div>
+    
+  </header>
+  <article id="https://www.notion.so/02bfa653e7524f6c96966a1a11f6015d" class="PageRoot"><ul id="https://www.notion.so/3e41172557774cf481480cc5df00cb04" class="ColorfulBlock ColorfulBlock--ColorGray TableOfContents"><li class="TableOfContents__Item"><a href="#https://www.notion.so/bdb1bb8b8e604cd5a71aaf27a9de3fcc"><div style="margin-left:0px"><span class="SemanticStringArray"><span class="SemanticString">幻读</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/60e9fa258a1343a9bb1e2f7f65299223"><div style="margin-left:0px"><span class="SemanticStringArray"><span class="SemanticString">解决方案</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/3600c963a4c64f9687bc78f28ab82e56"><div style="margin-left:24px"><span class="SemanticStringArray"><span class="SemanticString">针对</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">快照读</strong></span><span class="SemanticString">（普通 select 语句），是</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">通过 MVCC 方式解决了幻读</strong></span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/cbe03f1eac804cec90124c4c72ca159b"><div style="margin-left:48px"><span class="SemanticStringArray"><span class="SemanticString">就是其他事务看不到本事务添加数据的情况</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/0bcf973369cc4420b55dd2459a440d69"><div style="margin-left:24px"><span class="SemanticStringArray"><span class="SemanticString">针对</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">当前读</strong></span><span class="SemanticString">（select ... for update 等语句），是</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">通过 next-key lock（记录锁+间隙锁）方式解决了幻读</strong></span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/e031dc489c804ab9bab2b52cc251eb7b"><div style="margin-left:48px"><span class="SemanticStringArray"><span class="SemanticString">比如 update、insert、delete，这些语句执行前都会查询最新版本的数据，然后再做进一步的操作。</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/a2a7696ae39c449bb1ef1c5ca2e7f7b4"><div style="margin-left:48px"><span class="SemanticStringArray"><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">select ... for update</code></span><span class="SemanticString"> 这种查询语句是当前读，每次执行的时候都是读取最新的数据。</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/911744e075f9448bb683b568d4e72756"><div style="margin-left:48px"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">Innodb 引擎为了解决「可重复读」隔离级别使用「当前读」而造成的幻读问题，就引出了间隙锁</strong></span><span class="SemanticString">。</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/e352bcb4ce23402bb2eb2e131d3155f0"><div style="margin-left:24px"><span class="SemanticStringArray"><span class="SemanticString">幻读被完全解决了吗</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/40b3c54da3e44034b59354a2ff7e6d0b"><div style="margin-left:48px"><span class="SemanticStringArray"><span class="SemanticString">举例</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/856e8f3f629b4e8d96d453c54ad60af2"><div style="margin-left:72px"><span class="SemanticStringArray"><span class="SemanticString">具体原因是：在可重复读隔离级别下，事务 A 第一次执行普通的 select 语句时生成了一个 ReadView，之后事务 B 向表中新插入了一条 id = 5 的记录并提交。接着，事务 A 对 id = 5 这条记录进行了更新操作，在这个时刻，这条新记录的 trx_id 隐藏列的值就变成了事务 A 的事务 id，之后事务 A 再使用普通 select 语句去查询这条记录时就可以看到这条记录了，于是就发生了幻读。</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/b25e3f6622f449f9ba8d754a7e3d8492"><div style="margin-left:72px"><span class="SemanticStringArray"><span class="SemanticString">这也算是快照读和当前读的混用？</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/604d082d306d4f6fa09ecf08b4e69d43"><div style="margin-left:48px"><span class="SemanticStringArray"><span class="SemanticString">补充，关于记录中的隐藏字段</span></span></div></a></li><li class="TableOfContents__Item"><a href="#https://www.notion.so/9211b57c98e6467397d2d0a71d5c7d1d"><div style="margin-left:24px"><span class="SemanticStringArray"><span class="SemanticString">如何解决</span></span></div></a></li></ul><h1 id="https://www.notion.so/bdb1bb8b8e604cd5a71aaf27a9de3fcc" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/bdb1bb8b8e604cd5a71aaf27a9de3fcc"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">幻读</span></span></h1><div id="https://www.notion.so/e91ef94b40784d8cb7047970a622c10a" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">当同一个查询在不同的时间产生不同的结果集时，事务中就会出现所谓的幻象问题。例如，如果 SELECT 执行了两次，但第二次返回了第一次没有返回的行，则该行是“幻像”行。</span></span></p></div><h1 id="https://www.notion.so/60e9fa258a1343a9bb1e2f7f65299223" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/60e9fa258a1343a9bb1e2f7f65299223"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">解决方案</span></span></h1><h2 id="https://www.notion.so/3600c963a4c64f9687bc78f28ab82e56" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/3600c963a4c64f9687bc78f28ab82e56"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">针对</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">快照读</strong></span><span class="SemanticString">（普通 select 语句），是</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">通过 MVCC 方式解决了幻读</strong></span></span></h2><h3 id="https://www.notion.so/cbe03f1eac804cec90124c4c72ca159b" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/cbe03f1eac804cec90124c4c72ca159b"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">就是其他事务看不到本事务添加数据的情况</span></span></h3><div id="https://www.notion.so/ab9abab945a34a1492174c1b07a32429" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">因为可重复读隔离级别下，事务执行过程中看到的数据，一直跟这个事务启动时看到的数据是一致的，即使中途有其他事务插入了一条数据，是查询不出来这条数据的，所以就很好了避免幻读问题。</span></span></p></div><h2 id="https://www.notion.so/0bcf973369cc4420b55dd2459a440d69" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/0bcf973369cc4420b55dd2459a440d69"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">针对</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">当前读</strong></span><span class="SemanticString">（select ... for update 等语句），是</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">通过 next-key lock（记录锁+间隙锁）方式解决了幻读</strong></span></span></h2><div id="https://www.notion.so/1cbbd8cc1cb647f69e2b68378670628f" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">因为当执行 select ... for update 语句的时候，会加上 next-key lock，如果有其他事务在 next-key lock 锁范围内插入了一条记录，那么这个插入语句就会被阻塞，无法成功插入，所以就很好了避免幻读问题。</span></span></p></div><h3 id="https://www.notion.so/e031dc489c804ab9bab2b52cc251eb7b" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/e031dc489c804ab9bab2b52cc251eb7b"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">比如 update、insert、delete，这些语句执行前都会查询最新版本的数据，然后再做进一步的操作。</span></span></h3><h3 id="https://www.notion.so/a2a7696ae39c449bb1ef1c5ca2e7f7b4" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/a2a7696ae39c449bb1ef1c5ca2e7f7b4"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">select ... for update</code></span><span class="SemanticString"> 这种查询语句是当前读，每次执行的时候都是读取最新的数据。</span></span></h3><div id="https://www.notion.so/1306a20b8d9945eaae8d068cbb028ac1" class="Image Image--PageWidth"><figure><a href="https://prod-files-secure.s3.us-west-2.amazonaws.com/97f60ed7-2f91-4328-9e16-bcc075d7c8a7/17376cf0-6d36-4e6e-a2ae-b1003ab5cb0e/Untitled.png?width=1217"><img src="https://prod-files-secure.s3.us-west-2.amazonaws.com/97f60ed7-2f91-4328-9e16-bcc075d7c8a7/17376cf0-6d36-4e6e-a2ae-b1003ab5cb0e/Untitled.png?width=1217" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><h3 id="https://www.notion.so/911744e075f9448bb683b568d4e72756" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/911744e075f9448bb683b568d4e72756"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">Innodb 引擎为了解决「可重复读」隔离级别使用「当前读」而造成的幻读问题，就引出了间隙锁</strong></span><span class="SemanticString">。</span></span></h3><div id="https://www.notion.so/020f7a5a119b4a179d633a43e1b1f065" class="Image Image--PageWidth"><figure><a href="https://prod-files-secure.s3.us-west-2.amazonaws.com/97f60ed7-2f91-4328-9e16-bcc075d7c8a7/9ebb83c6-b4d7-4f55-b924-5d91769614da/Untitled.png?width=1203"><img src="https://prod-files-secure.s3.us-west-2.amazonaws.com/97f60ed7-2f91-4328-9e16-bcc075d7c8a7/9ebb83c6-b4d7-4f55-b924-5d91769614da/Untitled.png?width=1203" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><h1 id="https://www.notion.so/e352bcb4ce23402bb2eb2e131d3155f0" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/e352bcb4ce23402bb2eb2e131d3155f0"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">幻读被完全解决了吗</span></span></h1><div id="https://www.notion.so/9cf00528334043d3ab98f380ffe20409" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">可重复读隔离级别下虽然很大程度上避免了幻读，但是还是没有能完全解决幻读</strong></span><span class="SemanticString">。</span></span></p></div><div id="https://www.notion.so/f010e79e10bb4554a449036979a46cb2" class="Image Image--PageWidth"><figure><a href="https://prod-files-secure.s3.us-west-2.amazonaws.com/97f60ed7-2f91-4328-9e16-bcc075d7c8a7/5c7af37f-5314-46fb-a24f-93e20cc2e504/Untitled.png?width=836"><img src="https://prod-files-secure.s3.us-west-2.amazonaws.com/97f60ed7-2f91-4328-9e16-bcc075d7c8a7/5c7af37f-5314-46fb-a24f-93e20cc2e504/Untitled.png?width=836" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><h2 id="https://www.notion.so/40b3c54da3e44034b59354a2ff7e6d0b" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/40b3c54da3e44034b59354a2ff7e6d0b"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">举例</span></span></h2><div id="https://www.notion.so/8d425f26a53446e8890d243a8514e8d7" class="Image Image--PageWidth"><figure><a href="https://prod-files-secure.s3.us-west-2.amazonaws.com/97f60ed7-2f91-4328-9e16-bcc075d7c8a7/734b48d1-e23f-4552-96c9-928f5f8c4512/Untitled.png?width=1219"><img src="https://prod-files-secure.s3.us-west-2.amazonaws.com/97f60ed7-2f91-4328-9e16-bcc075d7c8a7/734b48d1-e23f-4552-96c9-928f5f8c4512/Untitled.png?width=1219" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><h3 id="https://www.notion.so/856e8f3f629b4e8d96d453c54ad60af2" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/856e8f3f629b4e8d96d453c54ad60af2"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">具体原因是：在可重复读隔离级别下，事务 A 第一次执行普通的 select 语句时生成了一个 ReadView，之后事务 B 向表中新插入了一条 id = 5 的记录并提交。接着，事务 A 对 id = 5 这条记录进行了更新操作，在这个时刻，这条新记录的 trx_id 隐藏列的值就变成了事务 A 的事务 id，之后事务 A 再使用普通 select 语句去查询这条记录时就可以看到这条记录了，于是就发生了幻读。</span></span></h3><h3 id="https://www.notion.so/b25e3f6622f449f9ba8d754a7e3d8492" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/b25e3f6622f449f9ba8d754a7e3d8492"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">这也算是快照读和当前读的混用？</span></span></h3><h2 id="https://www.notion.so/604d082d306d4f6fa09ecf08b4e69d43" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/604d082d306d4f6fa09ecf08b4e69d43"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">补充，关于记录中的隐藏字段</span></span></h2><div id="https://www.notion.so/48bdfe463cba487dac7017bd46985b21" class="Image Image--PageWidth"><figure><a href="https://prod-files-secure.s3.us-west-2.amazonaws.com/97f60ed7-2f91-4328-9e16-bcc075d7c8a7/0b7ab1ca-ef76-4b3c-82ee-6572bdd62d68/Untitled.png?width=1492"><img src="https://prod-files-secure.s3.us-west-2.amazonaws.com/97f60ed7-2f91-4328-9e16-bcc075d7c8a7/0b7ab1ca-ef76-4b3c-82ee-6572bdd62d68/Untitled.png?width=1492" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><h1 id="https://www.notion.so/9211b57c98e6467397d2d0a71d5c7d1d" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/9211b57c98e6467397d2d0a71d5c7d1d"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">如何解决</span></span></h1><div id="https://www.notion.so/db072a334abe4065bf8b2f7a48e45931" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">就是尽量在开启事务之后，马上执行 select ... for update 这类当前读的语句，因为它会对记录加行级别，从而避免其他事务插入一条新记录。</span></span></p></div></article>
+  <footer class="Footer">
+  <div>&copy; 沂风 2022</div>
+  <div>&centerdot;</div>
+  <div>Powered by <a href="https://github.com/dragonman225/notablog" target="_blank"
+      rel="noopener noreferrer">Notablog</a>.
+  </div>
+</footer>
+</body>
+
+</html>
